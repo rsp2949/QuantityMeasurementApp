@@ -2,64 +2,82 @@ package src.com.apps.quantitymeasurement;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class QuantityMeasurementAppTest {
 
     @Test
-    public void testFeetEquality_SameValue() {
-        QuantityMeasurementApp.Feet f1 =
-                new QuantityMeasurementApp.Feet(1.0);
-        QuantityMeasurementApp.Feet f2 =
-                new QuantityMeasurementApp.Feet(1.0);
+    public void testEquality_FeetToFeet_SameValue() {
+        QuantityMeasurementApp.Length l1 =
+                new QuantityMeasurementApp.Length(1.0,
+                        QuantityMeasurementApp.LengthUnit.FEET);
 
-        assertTrue(f1.equals(f2));
+        QuantityMeasurementApp.Length l2 =
+                new QuantityMeasurementApp.Length(1.0,
+                        QuantityMeasurementApp.LengthUnit.FEET);
+
+        assertTrue(l1.equals(l2));
     }
 
     @Test
-    public void testFeetEquality_DifferentValue() {
-        QuantityMeasurementApp.Feet f1 =
-                new QuantityMeasurementApp.Feet(1.0);
-        QuantityMeasurementApp.Feet f2 =
-                new QuantityMeasurementApp.Feet(2.0);
+    public void testEquality_InchToInch_SameValue() {
+        QuantityMeasurementApp.Length l1 =
+                new QuantityMeasurementApp.Length(1.0,
+                        QuantityMeasurementApp.LengthUnit.INCHES);
 
-        assertFalse(f1.equals(f2));
+        QuantityMeasurementApp.Length l2 =
+                new QuantityMeasurementApp.Length(1.0,
+                        QuantityMeasurementApp.LengthUnit.INCHES);
+
+        assertTrue(l1.equals(l2));
     }
 
     @Test
-    public void testFeetEquality_NullComparison() {
-        QuantityMeasurementApp.Feet f1 =
-                new QuantityMeasurementApp.Feet(1.0);
+    public void testEquality_FeetToInch_EquivalentValue() {
+        QuantityMeasurementApp.Length l1 =
+                new QuantityMeasurementApp.Length(1.0,
+                        QuantityMeasurementApp.LengthUnit.FEET);
 
-        assertFalse(f1.equals(null));
+        QuantityMeasurementApp.Length l2 =
+                new QuantityMeasurementApp.Length(12.0,
+                        QuantityMeasurementApp.LengthUnit.INCHES);
+
+        assertTrue(l1.equals(l2));
     }
 
     @Test
-    public void testInchesEquality_SameValue() {
-        QuantityMeasurementApp.Inches i1 =
-                new QuantityMeasurementApp.Inches(12.0);
-        QuantityMeasurementApp.Inches i2 =
-                new QuantityMeasurementApp.Inches(12.0);
+    public void testEquality_DifferentValue() {
+        QuantityMeasurementApp.Length l1 =
+                new QuantityMeasurementApp.Length(2.0,
+                        QuantityMeasurementApp.LengthUnit.FEET);
 
-        assertTrue(i1.equals(i2));
+        QuantityMeasurementApp.Length l2 =
+                new QuantityMeasurementApp.Length(1.0,
+                        QuantityMeasurementApp.LengthUnit.FEET);
+
+        assertFalse(l1.equals(l2));
     }
 
     @Test
-    public void testInchesEquality_DifferentValue() {
-        QuantityMeasurementApp.Inches i1 =
-                new QuantityMeasurementApp.Inches(12.0);
-        QuantityMeasurementApp.Inches i2 =
-                new QuantityMeasurementApp.Inches(24.0);
+    public void testEquality_NullComparison() {
+        QuantityMeasurementApp.Length l1 =
+                new QuantityMeasurementApp.Length(1.0,
+                        QuantityMeasurementApp.LengthUnit.FEET);
 
-        assertFalse(i1.equals(i2));
+        assertFalse(l1.equals(null));
     }
 
     @Test
-    public void testInchesEquality_SameReference() {
-        QuantityMeasurementApp.Inches i1 =
-                new QuantityMeasurementApp.Inches(12.0);
+    public void testEquality_SameReference() {
+        QuantityMeasurementApp.Length l1 =
+                new QuantityMeasurementApp.Length(1.0,
+                        QuantityMeasurementApp.LengthUnit.FEET);
 
-        assertTrue(i1.equals(i1));
+        assertTrue(l1.equals(l1));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testEquality_NullUnit() {
+        new QuantityMeasurementApp.Length(1.0, null);
     }
 }
