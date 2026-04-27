@@ -2,79 +2,22 @@ package src.com.apps.quantitymeasurement;
 
 public class QuantityMeasurementApp {
 
-    public enum LengthUnit {
-        FEET(12.0),
-        INCHES(1.0),
-        YARDS(36.0),
-        CENTIMETERS(0.393701);
+    public static boolean demonstrateLengthEquality(
+            Length l1,
+            Length l2) {
 
-        private final double factor;
-
-        LengthUnit(double factor) {
-            this.factor = factor;
-        }
-
-        public double getFactor() {
-            return factor;
-        }
+        return l1.equals(l2);
     }
 
-    public static class Length {
-        private final double value;
-        private final LengthUnit unit;
+    public static Length demonstrateLengthConversion(
+            double value,
+            LengthUnit fromUnit,
+            LengthUnit toUnit) {
 
-        public Length(double value, LengthUnit unit) {
-            if (!Double.isFinite(value))
-                throw new IllegalArgumentException("Invalid value");
+        Length length =
+                new Length(value, fromUnit);
 
-            if (unit == null)
-                throw new IllegalArgumentException("Unit cannot be null");
-
-            this.value = value;
-            this.unit = unit;
-        }
-
-        private double toBase() {
-            return value * unit.getFactor();
-        }
-
-        public Length convertTo(LengthUnit targetUnit) {
-            if (targetUnit == null)
-                throw new IllegalArgumentException("Invalid target unit");
-
-            double converted = toBase() / targetUnit.getFactor();
-            return new Length(converted, targetUnit);
-        }
-
-        public Length add(Length other) {
-            return add(other, this.unit);
-        }
-
-        public Length add(Length other, LengthUnit targetUnit) {
-            if (other == null)
-                throw new IllegalArgumentException("Second operand cannot be null");
-
-            if (targetUnit == null)
-                throw new IllegalArgumentException("Target unit cannot be null");
-
-            double sumBase = this.toBase() + other.toBase();
-            double result = sumBase / targetUnit.getFactor();
-
-            return new Length(result, targetUnit);
-        }
-
-        public double getValue() {
-            return value;
-        }
-
-        public LengthUnit getUnit() {
-            return unit;
-        }
-
-        @Override
-        public String toString() {
-            return value + " " + unit;
-        }
+        return length.convertTo(toUnit);
     }
 
     public static Length demonstrateLengthAddition(
@@ -87,13 +30,28 @@ public class QuantityMeasurementApp {
 
     public static void main(String[] args) {
 
-        Length l1 = new Length(1.0, LengthUnit.FEET);
-        Length l2 = new Length(12.0, LengthUnit.INCHES);
+        Length l1 =
+                new Length(1.0, LengthUnit.FEET);
+
+        Length l2 =
+                new Length(12.0, LengthUnit.INCHES);
 
         System.out.println(
-                demonstrateLengthAddition(
-                        l1,
-                        l2,
-                        LengthUnit.YARDS));
+                "Equal : " +
+                        demonstrateLengthEquality(l1, l2));
+
+        System.out.println(
+                "Convert : " +
+                        demonstrateLengthConversion(
+                                1.0,
+                                LengthUnit.YARDS,
+                                LengthUnit.FEET));
+
+        System.out.println(
+                "Add : " +
+                        demonstrateLengthAddition(
+                                l1,
+                                l2,
+                                LengthUnit.YARDS));
     }
 }
