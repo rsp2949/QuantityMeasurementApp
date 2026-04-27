@@ -7,59 +7,52 @@ import static org.junit.Assert.*;
 public class QuantityMeasurementAppTest {
 
     @Test
-    public void testConvertToBaseUnit_InchesToFeet() {
+    public void testEquality_KilogramToGram() {
 
-        assertEquals(
-                12.0,
-                LengthUnit.INCHES.convertToBaseUnit(12.0),
-                0.001);
+        Weight w1 =
+                new Weight(1.0, WeightUnit.KILOGRAM);
+
+        Weight w2 =
+                new Weight(1000.0, WeightUnit.GRAM);
+
+        assertTrue(w1.equals(w2));
     }
 
     @Test
-    public void testConvertFromBaseUnit_FeetToInches() {
+    public void testEquality_KilogramToKilogram_Different() {
 
-        assertEquals(
-                12.0,
-                LengthUnit.INCHES.convertFromBaseUnit(12.0),
-                0.001);
+        Weight w1 =
+                new Weight(1.0, WeightUnit.KILOGRAM);
+
+        Weight w2 =
+                new Weight(2.0, WeightUnit.KILOGRAM);
+
+        assertFalse(w1.equals(w2));
     }
 
     @Test
-    public void testQuantityLengthRefactored_Equality() {
+    public void testConversion_KilogramToPound() {
 
-        Length l1 =
-                new Length(1.0, LengthUnit.FEET);
-
-        Length l2 =
-                new Length(12.0, LengthUnit.INCHES);
-
-        assertTrue(l1.equals(l2));
-    }
-
-    @Test
-    public void testQuantityLengthRefactored_ConvertTo() {
-
-        Length result =
-                new Length(1.0, LengthUnit.FEET)
-                        .convertTo(LengthUnit.INCHES);
+        Weight result =
+                new Weight(1.0, WeightUnit.KILOGRAM)
+                        .convertTo(WeightUnit.POUND);
 
         assertEquals(
-                12.0,
+                2.204,
                 result.getValue(),
                 0.01);
     }
 
     @Test
-    public void testQuantityLengthRefactored_Add() {
+    public void testAddition_KilogramPlusGram() {
 
-        Length l1 =
-                new Length(1.0, LengthUnit.FEET);
-
-        Length l2 =
-                new Length(12.0, LengthUnit.INCHES);
-
-        Length result =
-                l1.add(l2, LengthUnit.FEET);
+        Weight result =
+                new Weight(1.0, WeightUnit.KILOGRAM)
+                        .add(
+                                new Weight(
+                                        1000.0,
+                                        WeightUnit.GRAM),
+                                WeightUnit.KILOGRAM);
 
         assertEquals(
                 2.0,
@@ -67,15 +60,25 @@ public class QuantityMeasurementAppTest {
                 0.01);
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void testQuantityLengthRefactored_NullUnit() {
+    @Test
+    public void testNullComparison() {
 
-        new Length(1.0, null);
+        Weight w1 =
+                new Weight(1.0, WeightUnit.KILOGRAM);
+
+        assertFalse(w1.equals(null));
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testQuantityLengthRefactored_InvalidValue() {
+    public void testNullUnit() {
 
-        new Length(Double.NaN, LengthUnit.FEET);
+        new Weight(1.0, null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testInvalidValue() {
+
+        new Weight(Double.NaN,
+                WeightUnit.KILOGRAM);
     }
 }
