@@ -34,18 +34,34 @@ public class QuantityMeasurementApp {
             this.unit = unit;
         }
 
-        private double convertToBaseUnit() {
+        private double toBase() {
             return value * unit.getFactor();
         }
 
         public Length convertTo(LengthUnit targetUnit) {
             if (targetUnit == null)
-                throw new IllegalArgumentException("Target unit cannot be null");
+                throw new IllegalArgumentException("Invalid target unit");
 
-            double base = convertToBaseUnit();
-            double converted = base / targetUnit.getFactor();
-
+            double converted = toBase() / targetUnit.getFactor();
             return new Length(converted, targetUnit);
+        }
+
+        public Length add(Length other) {
+            if (other == null)
+                throw new IllegalArgumentException("Second operand cannot be null");
+
+            double sumBase = this.toBase() + other.toBase();
+            double result = sumBase / this.unit.getFactor();
+
+            return new Length(result, this.unit);
+        }
+
+        public double getValue() {
+            return value;
+        }
+
+        public LengthUnit getUnit() {
+            return unit;
         }
 
         @Override
@@ -55,65 +71,29 @@ public class QuantityMeasurementApp {
 
             Length other = (Length) obj;
 
-            return Math.abs(
-                    this.convertToBaseUnit() -
-                            other.convertToBaseUnit()
-            ) < 0.0001;
+            return Math.abs(this.toBase() - other.toBase()) < 0.0001;
         }
 
         @Override
         public String toString() {
-            return String.format("%.4f %s", value, unit);
+            return value + " " + unit;
         }
     }
 
-    public static double demonstrateLengthConversion(
-            double value,
-            LengthUnit fromUnit,
-            LengthUnit toUnit) {
+    public static Length demonstrateLengthAddition(
+            Length length1,
+            Length length2) {
 
-        Length length = new Length(value, fromUnit);
-        return length.convertTo(toUnit).value;
-    }
-
-    public static Length demonstrateLengthConversion(
-            Length length,
-            LengthUnit toUnit) {
-
-        return length.convertTo(toUnit);
-    }
-
-    public static boolean demonstrateLengthEquality(
-            Length l1,
-            Length l2) {
-
-        return l1.equals(l2);
+        return length1.add(length2);
     }
 
     public static void main(String[] args) {
 
-        System.out.println("Feet to Inches: " +
-                demonstrateLengthConversion(
-                        1.0,
-                        LengthUnit.FEET,
-                        LengthUnit.INCHES));
+        Length l1 = new Length(1.0, LengthUnit.FEET);
+        Length l2 = new Length(12.0, LengthUnit.INCHES);
 
-        System.out.println("Yards to Feet: " +
-                demonstrateLengthConversion(
-                        3.0,
-                        LengthUnit.YARDS,
-                        LengthUnit.FEET));
+        Length result = demonstrateLengthAddition(l1, l2);
 
-        System.out.println("Inches to Yards: " +
-                demonstrateLengthConversion(
-                        36.0,
-                        LengthUnit.INCHES,
-                        LengthUnit.YARDS));
-
-        System.out.println("Centimeters to Inches: " +
-                demonstrateLengthConversion(
-                        1.0,
-                        LengthUnit.CENTIMETERS,
-                        LengthUnit.INCHES));
+        System.out.println("Result: " + result);
     }
 }
