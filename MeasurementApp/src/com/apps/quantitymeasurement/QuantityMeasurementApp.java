@@ -47,13 +47,20 @@ public class QuantityMeasurementApp {
         }
 
         public Length add(Length other) {
+            return add(other, this.unit);
+        }
+
+        public Length add(Length other, LengthUnit targetUnit) {
             if (other == null)
                 throw new IllegalArgumentException("Second operand cannot be null");
 
-            double sumBase = this.toBase() + other.toBase();
-            double result = sumBase / this.unit.getFactor();
+            if (targetUnit == null)
+                throw new IllegalArgumentException("Target unit cannot be null");
 
-            return new Length(result, this.unit);
+            double sumBase = this.toBase() + other.toBase();
+            double result = sumBase / targetUnit.getFactor();
+
+            return new Length(result, targetUnit);
         }
 
         public double getValue() {
@@ -65,26 +72,17 @@ public class QuantityMeasurementApp {
         }
 
         @Override
-        public boolean equals(Object obj) {
-            if (this == obj) return true;
-            if (obj == null || getClass() != obj.getClass()) return false;
-
-            Length other = (Length) obj;
-
-            return Math.abs(this.toBase() - other.toBase()) < 0.0001;
-        }
-
-        @Override
         public String toString() {
             return value + " " + unit;
         }
     }
 
     public static Length demonstrateLengthAddition(
-            Length length1,
-            Length length2) {
+            Length l1,
+            Length l2,
+            LengthUnit targetUnit) {
 
-        return length1.add(length2);
+        return l1.add(l2, targetUnit);
     }
 
     public static void main(String[] args) {
@@ -92,8 +90,10 @@ public class QuantityMeasurementApp {
         Length l1 = new Length(1.0, LengthUnit.FEET);
         Length l2 = new Length(12.0, LengthUnit.INCHES);
 
-        Length result = demonstrateLengthAddition(l1, l2);
-
-        System.out.println("Result: " + result);
+        System.out.println(
+                demonstrateLengthAddition(
+                        l1,
+                        l2,
+                        LengthUnit.YARDS));
     }
 }
