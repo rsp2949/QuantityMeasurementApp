@@ -4,7 +4,9 @@ public class QuantityMeasurementApp {
 
     public enum LengthUnit {
         FEET(12.0),
-        INCHES(1.0);
+        INCHES(1.0),
+        YARDS(36.0),
+        CENTIMETERS(0.393701);
 
         private final double conversionFactor;
 
@@ -34,51 +36,50 @@ public class QuantityMeasurementApp {
         }
 
         public boolean compare(Length thatLength) {
-            return Double.compare(this.convertToBaseUnit(),
-                    thatLength.convertToBaseUnit()) == 0;
+            return Double.compare(
+                    this.convertToBaseUnit(),
+                    thatLength.convertToBaseUnit()
+            ) == 0;
         }
 
         @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+        public boolean equals(Object obj) {
+            if (this == obj) return true;
+            if (obj == null || getClass() != obj.getClass()) return false;
 
-            Length that = (Length) o;
-            return compare(that);
+            Length other = (Length) obj;
+            return compare(other);
         }
     }
 
-    public static boolean demonstrateLengthEquality(Length length1, Length length2) {
-        return length1.equals(length2);
+    public static boolean demonstrateLengthEquality(Length l1, Length l2) {
+        return l1.equals(l2);
     }
 
-    public static void demonstrateFeetEquality() {
-        Length l1 = new Length(1.0, LengthUnit.FEET);
-        Length l2 = new Length(1.0, LengthUnit.FEET);
+    public static void demonstrateLengthComparison(
+            double value1, LengthUnit unit1,
+            double value2, LengthUnit unit2) {
 
-        System.out.println("Input: Quantity(1.0, FEET) and Quantity(1.0, FEET)");
-        System.out.println("Output: Equal (" + demonstrateLengthEquality(l1, l2) + ")");
-    }
+        Length l1 = new Length(value1, unit1);
+        Length l2 = new Length(value2, unit2);
 
-    public static void demonstrateInchesEquality() {
-        Length l1 = new Length(1.0, LengthUnit.INCHES);
-        Length l2 = new Length(1.0, LengthUnit.INCHES);
-
-        System.out.println("Input: Quantity(1.0, INCHES) and Quantity(1.0, INCHES)");
-        System.out.println("Output: Equal (" + demonstrateLengthEquality(l1, l2) + ")");
-    }
-
-    public static void demonstrateFeetInchesComparison() {
-        Length l1 = new Length(1.0, LengthUnit.FEET);
-        Length l2 = new Length(12.0, LengthUnit.INCHES);
-
-        System.out.println("Input: Quantity(1.0, FEET) and Quantity(12.0, INCHES)");
-        System.out.println("Output: Equal (" + demonstrateLengthEquality(l1, l2) + ")");
+        System.out.println("Input: Quantity(" + value1 + ", " + unit1 +
+                ") and Quantity(" + value2 + ", " + unit2 + ")");
+        System.out.println("Output: Equal (" +
+                demonstrateLengthEquality(l1, l2) + ")");
     }
 
     public static void main(String[] args) {
-        demonstrateFeetEquality();
-        demonstrateInchesEquality();
-        demonstrateFeetInchesComparison();
+        demonstrateLengthComparison(1.0, LengthUnit.YARDS,
+                3.0, LengthUnit.FEET);
+
+        demonstrateLengthComparison(1.0, LengthUnit.YARDS,
+                36.0, LengthUnit.INCHES);
+
+        demonstrateLengthComparison(1.0, LengthUnit.CENTIMETERS,
+                0.393701, LengthUnit.INCHES);
+
+        demonstrateLengthComparison(30.48, LengthUnit.CENTIMETERS,
+                1.0, LengthUnit.FEET);
     }
 }
