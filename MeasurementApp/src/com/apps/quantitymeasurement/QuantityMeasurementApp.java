@@ -8,38 +8,44 @@ public class QuantityMeasurementApp {
         YARDS(36.0),
         CENTIMETERS(0.393701);
 
-        private final double conversionFactor;
+        private final double factor;
 
-        LengthUnit(double conversionFactor) {
-            this.conversionFactor = conversionFactor;
+        LengthUnit(double factor) {
+            this.factor = factor;
         }
 
-        public double getConversionFactor() {
-            return conversionFactor;
+        public double getFactor() {
+            return factor;
         }
     }
 
     public static class Length {
-        private double value;
-        private LengthUnit unit;
+        private final double value;
+        private final LengthUnit unit;
 
         public Length(double value, LengthUnit unit) {
-            if (unit == null) {
+            if (!Double.isFinite(value))
+                throw new IllegalArgumentException("Invalid value");
+
+            if (unit == null)
                 throw new IllegalArgumentException("Unit cannot be null");
-            }
+
             this.value = value;
             this.unit = unit;
         }
 
         private double convertToBaseUnit() {
-            return value * unit.getConversionFactor();
+            return value * unit.getFactor();
         }
 
-        public boolean compare(Length thatLength) {
-            return Double.compare(
-                    this.convertToBaseUnit(),
-                    thatLength.convertToBaseUnit()
-            ) == 0;
+        public Length convertTo(LengthUnit targetUnit) {
+            if (targetUnit == null)
+                throw new IllegalArgumentException("Target unit cannot be null");
+
+            double base = convertToBaseUnit();
+            double converted = base / targetUnit.getFactor();
+
+            return new Length(converted, targetUnit);
         }
 
         @Override
@@ -48,38 +54,66 @@ public class QuantityMeasurementApp {
             if (obj == null || getClass() != obj.getClass()) return false;
 
             Length other = (Length) obj;
-            return compare(other);
+
+            return Math.abs(
+                    this.convertToBaseUnit() -
+                            other.convertToBaseUnit()
+            ) < 0.0001;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("%.4f %s", value, unit);
         }
     }
 
-    public static boolean demonstrateLengthEquality(Length l1, Length l2) {
+    public static double demonstrateLengthConversion(
+            double value,
+            LengthUnit fromUnit,
+            LengthUnit toUnit) {
+
+        Length length = new Length(value, fromUnit);
+        return length.convertTo(toUnit).value;
+    }
+
+    public static Length demonstrateLengthConversion(
+            Length length,
+            LengthUnit toUnit) {
+
+        return length.convertTo(toUnit);
+    }
+
+    public static boolean demonstrateLengthEquality(
+            Length l1,
+            Length l2) {
+
         return l1.equals(l2);
     }
 
-    public static void demonstrateLengthComparison(
-            double value1, LengthUnit unit1,
-            double value2, LengthUnit unit2) {
-
-        Length l1 = new Length(value1, unit1);
-        Length l2 = new Length(value2, unit2);
-
-        System.out.println("Input: Quantity(" + value1 + ", " + unit1 +
-                ") and Quantity(" + value2 + ", " + unit2 + ")");
-        System.out.println("Output: Equal (" +
-                demonstrateLengthEquality(l1, l2) + ")");
-    }
-
     public static void main(String[] args) {
-        demonstrateLengthComparison(1.0, LengthUnit.YARDS,
-                3.0, LengthUnit.FEET);
 
-        demonstrateLengthComparison(1.0, LengthUnit.YARDS,
-                36.0, LengthUnit.INCHES);
+        System.out.println("Feet to Inches: " +
+                demonstrateLengthConversion(
+                        1.0,
+                        LengthUnit.FEET,
+                        LengthUnit.INCHES));
 
-        demonstrateLengthComparison(1.0, LengthUnit.CENTIMETERS,
-                0.393701, LengthUnit.INCHES);
+        System.out.println("Yards to Feet: " +
+                demonstrateLengthConversion(
+                        3.0,
+                        LengthUnit.YARDS,
+                        LengthUnit.FEET));
 
-        demonstrateLengthComparison(30.48, LengthUnit.CENTIMETERS,
-                1.0, LengthUnit.FEET);
+        System.out.println("Inches to Yards: " +
+                demonstrateLengthConversion(
+                        36.0,
+                        LengthUnit.INCHES,
+                        LengthUnit.YARDS));
+
+        System.out.println("Centimeters to Inches: " +
+                demonstrateLengthConversion(
+                        1.0,
+                        LengthUnit.CENTIMETERS,
+                        LengthUnit.INCHES));
     }
 }
