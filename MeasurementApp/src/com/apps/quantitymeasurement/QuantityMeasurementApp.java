@@ -2,56 +2,53 @@ package src.com.apps.quantitymeasurement;
 
 public class QuantityMeasurementApp {
 
-    public static boolean demonstrateLengthEquality(
-            Length l1,
-            Length l2) {
+    public static boolean demonstrateWeightEquality(
+            Weight w1,
+            Weight w2) {
 
-        return l1.equals(l2);
+        return w1.equals(w2);
     }
 
-    public static Length demonstrateLengthConversion(
+    public static Weight demonstrateWeightConversion(
             double value,
-            LengthUnit fromUnit,
-            LengthUnit toUnit) {
+            WeightUnit from,
+            WeightUnit to) {
 
-        Length length =
-                new Length(value, fromUnit);
-
-        return length.convertTo(toUnit);
+        return new Weight(value, from).convertTo(to);
     }
 
-    public static Length demonstrateLengthAddition(
-            Length l1,
-            Length l2,
-            LengthUnit targetUnit) {
+    public static Weight demonstrateWeightAddition(
+            Weight w1,
+            Weight w2,
+            WeightUnit target) {
 
-        return l1.add(l2, targetUnit);
+        return w1.add(w2, target);
     }
 
     public static void main(String[] args) {
 
-        Length l1 =
-                new Length(1.0, LengthUnit.FEET);
+        Weight w1 =
+                new Weight(1.0, WeightUnit.KILOGRAM);
 
-        Length l2 =
-                new Length(12.0, LengthUnit.INCHES);
+        Weight w2 =
+                new Weight(1000.0, WeightUnit.GRAM);
 
         System.out.println(
                 "Equal : " +
-                        demonstrateLengthEquality(l1, l2));
+                        demonstrateWeightEquality(w1, w2));
 
         System.out.println(
                 "Convert : " +
-                        demonstrateLengthConversion(
+                        demonstrateWeightConversion(
                                 1.0,
-                                LengthUnit.YARDS,
-                                LengthUnit.FEET));
+                                WeightUnit.KILOGRAM,
+                                WeightUnit.POUND));
 
         System.out.println(
                 "Add : " +
-                        demonstrateLengthAddition(
-                                l1,
-                                l2,
-                                LengthUnit.YARDS));
+                        demonstrateWeightAddition(
+                                w1,
+                                w2,
+                                WeightUnit.KILOGRAM));
     }
 }
