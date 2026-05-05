@@ -2,53 +2,46 @@ package src.com.apps.quantitymeasurement;
 
 public class QuantityMeasurementApp {
 
-    public static boolean demonstrateWeightEquality(
-            Weight w1,
-            Weight w2) {
-
-        return w1.equals(w2);
+    public static <U extends IMeasurable> boolean demonstrateEquality(
+            Quantity<U> q1, Quantity<U> q2) {
+        return q1.equals(q2);
     }
 
-    public static Weight demonstrateWeightConversion(
-            double value,
-            WeightUnit from,
-            WeightUnit to) {
-
-        return new Weight(value, from).convertTo(to);
+    public static <U extends IMeasurable> Quantity<U> demonstrateConversion(
+            Quantity<U> q, U targetUnit) {
+        return q.convertTo(targetUnit);
     }
 
-    public static Weight demonstrateWeightAddition(
-            Weight w1,
-            Weight w2,
-            WeightUnit target) {
+    public static <U extends IMeasurable> Quantity<U> demonstrateAddition(
+            Quantity<U> q1, Quantity<U> q2) {
+        return q1.add(q2);
+    }
 
-        return w1.add(w2, target);
+    public static <U extends IMeasurable> Quantity<U> demonstrateAddition(
+            Quantity<U> q1, Quantity<U> q2, U targetUnit) {
+        return q1.add(q2, targetUnit);
     }
 
     public static void main(String[] args) {
 
-        Weight w1 =
-                new Weight(1.0, WeightUnit.KILOGRAM);
+        // LENGTH
+        Quantity<LengthUnit> l1 = new Quantity<>(1.0, LengthUnit.FEET);
+        Quantity<LengthUnit> l2 = new Quantity<>(12.0, LengthUnit.INCHES);
 
-        Weight w2 =
-                new Weight(1000.0, WeightUnit.GRAM);
+        System.out.println("Length Equal: " + demonstrateEquality(l1, l2));
+        System.out.println("Convert: " + demonstrateConversion(l1, LengthUnit.INCHES));
+        System.out.println("Add: " + demonstrateAddition(l1, l2));
+        System.out.println("Add Target: " +
+                demonstrateAddition(l1, l2, LengthUnit.YARDS));
 
-        System.out.println(
-                "Equal : " +
-                        demonstrateWeightEquality(w1, w2));
+        // WEIGHT
+        Quantity<WeightUnit> w1 = new Quantity<>(1.0, WeightUnit.KILOGRAM);
+        Quantity<WeightUnit> w2 = new Quantity<>(1000.0, WeightUnit.GRAM);
 
-        System.out.println(
-                "Convert : " +
-                        demonstrateWeightConversion(
-                                1.0,
-                                WeightUnit.KILOGRAM,
-                                WeightUnit.POUND));
-
-        System.out.println(
-                "Add : " +
-                        demonstrateWeightAddition(
-                                w1,
-                                w2,
-                                WeightUnit.KILOGRAM));
+        System.out.println("Weight Equal: " + demonstrateEquality(w1, w2));
+        System.out.println("Convert: " + demonstrateConversion(w1, WeightUnit.GRAM));
+        System.out.println("Add: " + demonstrateAddition(w1, w2));
+        System.out.println("Add Target: " +
+                demonstrateAddition(w1, w2, WeightUnit.POUND));
     }
 }
