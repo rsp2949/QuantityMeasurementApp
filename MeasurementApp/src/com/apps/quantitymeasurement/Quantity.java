@@ -6,7 +6,7 @@ public class Quantity<U extends IMeasurable> {
     private final U unit;
 
     public Quantity(double value, U unit) {
-        if (unit == null || !Double.isFinite(value)) {
+        if (!Double.isFinite(value) || unit == null) {
             throw new IllegalArgumentException("Invalid input");
         }
         this.value = value;
@@ -21,49 +21,96 @@ public class Quantity<U extends IMeasurable> {
         return unit;
     }
 
-    // Convert to another unit
-    public Quantity<U> convertTo(U targetUnit) {
-        double baseValue = unit.convertToBaseUnit(value);
-        double converted = targetUnit.convertFromBaseUnit(baseValue);
-        return new Quantity<>(converted, targetUnit);
-    }
-
-    // Add (same unit result)
-    public Quantity<U> add(Quantity<U> other) {
-        double sumBase = this.unit.convertToBaseUnit(this.value)
-                + other.unit.convertToBaseUnit(other.value);
-
-        double result = this.unit.convertFromBaseUnit(sumBase);
-        return new Quantity<>(result, this.unit);
-    }
-
-    // Add with target unit
-    public Quantity<U> add(Quantity<U> other, U targetUnit) {
-        double sumBase = this.unit.convertToBaseUnit(this.value)
-                + other.unit.convertToBaseUnit(other.value);
-
-        double result = targetUnit.convertFromBaseUnit(sumBase);
-        return new Quantity<>(result, targetUnit);
-    }
-
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
-        if (obj == null || !(obj instanceof Quantity)) return false;
+        if (obj == null || getClass() != obj.getClass()) return false;
 
-        Quantity<?> that = (Quantity<?>) obj;
+        Quantity<?> other = (Quantity<?>) obj;
 
-        // Prevent cross-category comparison
-        if (this.unit.getClass() != that.unit.getClass()) return false;
+        if (!this.unit.getClass().equals(other.unit.getClass())) {
+            return false;
+        }
 
-        double thisBase = this.unit.convertToBaseUnit(this.value);
-        double thatBase = that.unit.convertToBaseUnit(that.value);
+        double base1 = this.unit.convertToBaseUnit(this.value);
+        double base2 = other.unit.convertToBaseUnit(other.value);
 
-        return Double.compare(thisBase, thatBase) == 0;
+        return Math.abs(base1 - base2) < 0.0001;
     }
 
-    @Override
-    public String toString() {
-        return value + " " + unit.getUnitName();
+    public Quantity<U> convertTo(U targetUnit) {
+        double base = unit.convertToBaseUnit(value);
+        double converted = targetUnit.convertFromBaseUnit(base);
+        return new Quantity<>(converted, targetUnit);
     }
+
+    public Quantity<U> add(Quantity<U> other) {
+        return add(other, this.unit);
+    }
+
+    public Quantity<U> add(Quantity<U> other, U targetUnit) {
+        if (other == null || targetUnit == null) {
+            throw new IllegalArgumentException("Invalid input");
+        }
+
+        if (!this.unit.getClass().equals(other.unit.getClass())) {
+            throw new IllegalArgumentException("Different measurement types");
+        }
+
+        double base1 = this.unit.convertToBaseUnit(this.value);
+        double base2 = other.unit.convertToBaseUnit(other.value);
+
+        double baseResult = base1 + base2;
+        double result = targetUnit.convertFromBaseUnit(baseResult);
+
+        return new Quantity<>(result, targetUnit);
+    }
+
+    // ===== UC12 START =====
+
+    public Quantity<U> subtract(Quantity<U> other) {
+        return subtract(other, this.unit);
+    }
+
+    public Quantity<U> subtract(Quantity<U> other, U targetUnit) {
+        if (other == null || targetUnit == null) {
+            throw new IllegalArgumentException("Invalid input");
+        }
+
+        if (!this.unit.getClass().equals(other.unit.getClass())) {
+            throw new IllegalArgumentException("Different measurement types");
+        }
+
+        double base1 = this.unit.convertToBaseUnit(this.value);
+        double base2 = other.unit.convertToBaseUnit(other.value);
+
+        double baseResult = base1 - base2;
+
+        double result = targetUnit.convertFromBaseUnit(baseResult);
+
+        result = Math.round(result * 100.0) / 100.0;
+
+        return new Quantity<>(result, targetUnit);
+    }
+
+    public double divide(Quantity<U> other) {
+        if (other == null) {
+            throw new IllegalArgumentException("Invalid input");
+        }
+
+        if (!this.unit.getClass().equals(other.unit.getClass())) {
+            throw new IllegalArgumentException("Different measurement types");
+        }
+
+        double base1 = this.unit.convertToBaseUnit(this.value);
+        double base2 = other.unit.convertToBaseUnit(other.value);
+
+        if (base2 == 0) {
+            throw new ArithmeticException("Division by zero");
+        }
+
+        return base1 / base2;
+    }
+
+    // ===== UC12 END =====
 }
