@@ -111,6 +111,43 @@ public class Quantity<U extends IMeasurable> {
 
         return base1 / base2;
     }
+    private enum ArithmeticOperation {
+        ADD {
+            double apply(double a, double b) { return a + b; }
+        },
+        SUBTRACT {
+            double apply(double a, double b) { return a - b; }
+        },
+        DIVIDE {
+            double apply(double a, double b) {
+                if (b == 0) throw new ArithmeticException("Division by zero");
+                return a / b;
+            }
+        };
 
-    // ===== UC12 END =====
+        abstract double apply(double a, double b);
+    }
+    private void validate(Quantity<U> other, U targetUnit, boolean needTarget) {
+        if (other == null) throw new IllegalArgumentException("Invalid input");
+
+        if (!this.unit.getClass().equals(other.unit.getClass())) {
+            throw new IllegalArgumentException("Different measurement types");
+        }
+
+        if (!Double.isFinite(this.value) || !Double.isFinite(other.value)) {
+            throw new IllegalArgumentException("Invalid number");
+        }
+
+        if (needTarget && targetUnit == null) {
+            throw new IllegalArgumentException("Target unit required");
+        }
+    }
+    private double perform(Quantity<U> other, ArithmeticOperation op) {
+        double base1 = this.unit.convertToBaseUnit(this.value);
+        double base2 = other.unit.convertToBaseUnit(other.value);
+
+        return op.apply(base1, base2);
+    }
+
+
 }
