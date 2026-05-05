@@ -1,67 +1,71 @@
-package src.com.apps.quantitymeasurement;
-
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-public class VolumeTest {
+public class QuantityUC12Test {
 
     @Test
-    public void testEquality_LitreToMillilitre() {
-        Quantity<VolumeUnit> v1 = new Quantity<>(1.0, VolumeUnit.LITRE);
-        Quantity<VolumeUnit> v2 = new Quantity<>(1000.0, VolumeUnit.MILLILITRE);
+    public void testSubtraction_SameUnit() {
+        Quantity<LengthUnit> q1 = new Quantity<>(5.0, LengthUnit.FEET);
+        Quantity<LengthUnit> q2 = new Quantity<>(2.0, LengthUnit.FEET);
 
-        assertTrue(v1.equals(v2));
+        Quantity<LengthUnit> result = q1.subtract(q2);
+
+        assertEquals(3.0, result.getValue(), 0.01);
     }
 
     @Test
-    public void testEquality_LitreToGallon() {
-        Quantity<VolumeUnit> v1 = new Quantity<>(1.0, VolumeUnit.LITRE);
-        Quantity<VolumeUnit> v2 = new Quantity<>(0.264172, VolumeUnit.GALLON);
+    public void testSubtraction_CrossUnit() {
+        Quantity<LengthUnit> q1 = new Quantity<>(10.0, LengthUnit.FEET);
+        Quantity<LengthUnit> q2 = new Quantity<>(6.0, LengthUnit.INCHES);
 
-        assertTrue(v1.equals(v2));
+        Quantity<LengthUnit> result = q1.subtract(q2);
+
+        assertEquals(9.5, result.getValue(), 0.01);
     }
 
     @Test
-    public void testConversion_LitreToMillilitre() {
-        Quantity<VolumeUnit> v = new Quantity<>(1.0, VolumeUnit.LITRE);
-        Quantity<VolumeUnit> result = v.convertTo(VolumeUnit.MILLILITRE);
+    public void testSubtraction_TargetUnit() {
+        Quantity<LengthUnit> q1 = new Quantity<>(1.0, LengthUnit.FEET);
+        Quantity<LengthUnit> q2 = new Quantity<>(6.0, LengthUnit.INCHES);
 
-        assertEquals(1000.0, result.getValue(), 0.01);
+        Quantity<LengthUnit> result = q1.subtract(q2, LengthUnit.INCHES);
+
+        assertEquals(6.0, result.getValue(), 0.01);
     }
 
     @Test
-    public void testConversion_GallonToLitre() {
-        Quantity<VolumeUnit> v = new Quantity<>(1.0, VolumeUnit.GALLON);
-        Quantity<VolumeUnit> result = v.convertTo(VolumeUnit.LITRE);
+    public void testDivision_Basic() {
+        Quantity<WeightUnit> q1 = new Quantity<>(10.0, WeightUnit.KILOGRAM);
+        Quantity<WeightUnit> q2 = new Quantity<>(5.0, WeightUnit.KILOGRAM);
 
-        assertEquals(3.78541, result.getValue(), 0.01);
+        double result = q1.divide(q2);
+
+        assertEquals(2.0, result, 0.01);
     }
 
     @Test
-    public void testAddition_LitrePlusMillilitre() {
-        Quantity<VolumeUnit> v1 = new Quantity<>(1.0, VolumeUnit.LITRE);
-        Quantity<VolumeUnit> v2 = new Quantity<>(1000.0, VolumeUnit.MILLILITRE);
+    public void testDivision_CrossUnit() {
+        Quantity<VolumeUnit> q1 = new Quantity<>(1.0, VolumeUnit.LITRE);
+        Quantity<VolumeUnit> q2 = new Quantity<>(500.0, VolumeUnit.MILLILITRE);
 
-        Quantity<VolumeUnit> result = v1.add(v2);
+        double result = q1.divide(q2);
 
-        assertEquals(2.0, result.getValue(), 0.01);
+        assertEquals(2.0, result, 0.01);
     }
 
-    @Test
-    public void testAddition_TargetUnit() {
-        Quantity<VolumeUnit> v1 = new Quantity<>(1.0, VolumeUnit.LITRE);
-        Quantity<VolumeUnit> v2 = new Quantity<>(1.0, VolumeUnit.GALLON);
+    @Test(expected = ArithmeticException.class)
+    public void testDivision_ByZero() {
+        Quantity<WeightUnit> q1 = new Quantity<>(10.0, WeightUnit.KILOGRAM);
+        Quantity<WeightUnit> q2 = new Quantity<>(0.0, WeightUnit.KILOGRAM);
 
-        Quantity<VolumeUnit> result = v1.add(v2, VolumeUnit.MILLILITRE);
-
-        assertEquals(4785.41, result.getValue(), 0.1);
+        q1.divide(q2);
     }
 
-    @Test
-    public void testVolumeVsLength() {
-        Quantity<VolumeUnit> v = new Quantity<>(1.0, VolumeUnit.LITRE);
+    @Test(expected = IllegalArgumentException.class)
+    public void testDifferentTypes_Subtraction() {
         Quantity<LengthUnit> l = new Quantity<>(1.0, LengthUnit.FEET);
+        Quantity<WeightUnit> w = new Quantity<>(1.0, WeightUnit.KILOGRAM);
 
-        assertFalse(v.equals(l));
+        l.subtract((Quantity) w);
     }
 }
